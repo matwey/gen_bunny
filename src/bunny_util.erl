@@ -186,11 +186,11 @@ connect() ->
     connect(direct).
 
 connect(direct) ->
-    connect({direct, #amqp_params_network{}});
-connect({Type, Params}) when is_record(Params, amqp_params_network) ->
-    {ok, Connection} = amqp_connection:start(Type, Params),
-    {ok, Channel} = amqp_connection:open_channel(Connection),
-    {ok, {Connection, Channel}};
+    connect({direct, #amqp_params_direct{}});
+connect({direct, Params}) when is_record(Params, amqp_params_direct) ->
+    connect(Params);
+connect({network, Params}) when is_record(Params, amqp_params_network) ->
+    connect(Params);
 connect({network, Host}) ->
     connect({network, #amqp_params_network{host=Host}});
 connect({network, Host, Port}) ->
@@ -203,9 +203,11 @@ connect({network, Host, Port, {User, Pass}, VHost}) ->
     connect({network, #amqp_params_network{host=Host, port=Port,
                                    username=User,
                                    password=Pass,
-                                   virtual_host=VHost}}).
-
-
+                                   virtual_host=VHost}});
+connect(Params) when is_record(Params, amqp_params_direct); is_record(Params, amqp_params_network) ->
+    {ok, Connection} = amqp_connection:start(Params),
+    {ok, Channel} = amqp_connection:open_channel(Connection),
+    {ok, {Connection, Channel}}.
 
 declare(Channel, NameForEverything) when is_binary(NameForEverything) ->
     declare(Channel,
