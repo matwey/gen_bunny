@@ -192,7 +192,7 @@ connect({direct, Params}) when is_record(Params, amqp_params_direct) ->
 connect({network, Params}) when is_record(Params, amqp_params_network) ->
     connect(Params);
 connect({network, Host}) ->
-    connect({network, #amqp_params_network{host=Host}});
+    connect({network, #amqp_params_network{host=Host, port=?PROTOCOL_PORT}});
 connect({network, Host, Port}) ->
     connect({network, #amqp_params_network{host=Host, port=Port}});
 connect({network, Host, Port, {User, Pass}}) ->
